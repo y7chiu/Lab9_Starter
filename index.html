@@ -87,7 +87,13 @@
     </section>
   </main>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({
+      token: "cf0214ae518340658d43ac89df12ced3"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+    TrackJS.track('Testing TrackJS!');
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -102,6 +108,108 @@
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    var AjaxTCRExamples = {};
+
+    AjaxTCRExamples.reportJSError = function (errorMessage, url, lineNumber) {
+      function sendRequest(url, payload) {
+        var img = new Image();
+        img.src = url + "?" + payload;
+      }
+
+      /* form payload string with error data */
+      var payload = "url=" + AjaxTCRExamples.encodeValue(url);
+      payload += "&message=" + AjaxTCRExamples.encodeValue(errorMessage);
+      payload += "&line=" + AjaxTCRExamples.encodeValue(lineNumber);
+
+      /* submit error message  */
+      sendRequest(AjaxTCRExamples.errorReportingURL, payload);
+
+      alert("JavaScript Error Encountered.  \nSite Administrators have been notified.");
+
+      return true; // suppress normal JS errors since we handled
+    }
+
+    AjaxTCRExamples.registerErrorHandler = function () {
+      if (window.onerror) // then one exists
+      {
+        var oldError = window.onerror;
+        var newErrorHandler = function (errorMessage, url, lineNumber) { AjaxTCRExamples.reportJSError(errorMessage, url, lineNumber); oldError(errorMessage, url, lineNumber); }
+        window.onerror = newErrorHandler;
+      }
+      else
+        window.onerror = AjaxTCRExamples.reportJSError;
+    }
+
+    // Bind the error handler
+    AjaxTCRExamples.registerErrorHandler();
+
+
+    errorBtns.forEach(button => {
+      button.addEventListener('click', e => {
+        if (e.target.textContent === 'Console Log') {
+          console.log('Console Log Demo');
+        } else if (e.target.textContent === 'Console Error') {
+          console.error('Console Error Demo');
+        } else if (e.target.textContent === 'Console Count') {
+          console.count('count button');
+        } else if (e.target.textContent === 'Console Warn') {
+          console.warn('Console Warn Button');
+        } else if (e.target.textContent === 'Console Assert') {
+          console.assert(2 == 3, {
+            number: 2,
+            errorMsg: 'The number does not equal 3'
+          });
+        } else if (e.target.textContent === 'Console Clear') {
+          console.clear();
+        } else if (e.target.textContent === 'Console Dir') {
+          console.dir(button);
+        } else if (e.target.textContent === 'Console dirxml') {
+          console.dirxml(button);
+        } else if (e.target.textContent === 'Console Group Start') {
+          console.group('console.group');
+        } else if (e.target.textContent === 'Console Group End') {
+          console.groupEnd();
+        } else if (e.target.textContent === 'Console Table') {
+          console.table([{
+            name: 'CSE110',
+            score: 90
+          }, {
+            name: 'CSE100',
+            score: 85
+          }]);
+        } else if (e.target.textContent === 'Start Timer') {
+          console.time('Timer Button');
+        } else if (e.target.textContent === 'End Timer') {
+          console.timeEnd('Timer Button');
+        } else if (e.target.textContent === 'Console Trace') {
+          function deepest() {
+            console.trace();
+          }
+
+          function deeper() {
+            deepest();
+          }
+
+          function deep() {
+            deeper();
+          }
+          deep();
+        } else if (e.target.textContent === 'Trigger a Global Error') {
+          // Intentionally cause an error to demonstrate global error handling
+          try {
+            deepest();
+          } catch (error) {
+            console.error("Caught local error:", error.message);
+            throw error; // Re-throw the error to trigger the global error handler
+          }
+        }
+      });
+    });
+    function deepest() {
+      // This function does not exist and will cause a ReferenceError
+      nonexistentFunction();
+    }
   </script>
 </body>
 
